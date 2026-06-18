@@ -23,6 +23,7 @@ from flask import (
     redirect,
     url_for,
 )
+from werkzeug.exceptions import HTTPException
 from werkzeug.utils import secure_filename
 from waitress import serve
 
@@ -638,6 +639,8 @@ def too_large(_):
 
 @app.errorhandler(Exception)
 def handle_exception(error):
+    if isinstance(error, HTTPException):
+        return error
     logger.exception(f"Beklenmeyen hata: {error}")
     return "Sunucuda hata oluştu. Terminal ekranındaki loglara bakın.", 500
 
