@@ -1,0 +1,21 @@
+# Python sanal ortam
+.venv/
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Yüklenen medya dosyaları (upload klasörü app dizinidir)
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.webp
+*.heic
+*.heif
+*.mov
+*.mp4
+*.m4v
+*.avi
+*.mkv
