@@ -1,12 +1,17 @@
 from __future__ import annotations
 
+import io
 import os
+import base64
 import socket
 import secrets
 import logging
 from pathlib import Path
 from datetime import datetime
 from functools import wraps
+
+import qrcode
+import qrcode.image.svg
 
 from flask import (
     Flask,
@@ -33,6 +38,7 @@ ALLOWED_EXTENSIONS = {
 }
 
 MAX_UPLOAD_MB = int(os.environ.get("MAX_UPLOAD_MB", "4096"))
+PORT = int(os.environ.get("PORT", "5000"))
 UPLOAD_PASSWORD = os.environ.get("UPLOAD_PASSWORD", "").strip()
 VERBOSE_LOG = os.environ.get("VERBOSE_LOG", "1").strip() == "1"
 
@@ -205,6 +211,27 @@ HTML = """
             border-radius: 10px;
             margin-top: 12px;
         }
+
+        .qr-card {
+            text-align: center;
+        }
+
+        .qr-image {
+            width: 220px;
+            height: 220px;
+            margin: 8px auto 4px;
+            padding: 12px;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-radius: 12px;
+        }
+
+        .qr-url {
+            font-size: 14px;
+            color: #2563eb;
+            font-weight: 700;
+            word-break: break-all;
+        }
     </style>
 </head>
 
@@ -220,6 +247,20 @@ HTML = """
         <div class="status-box">
             <b>Durum:</b> Sunucu çalışıyor.
         </div>
+    </div>
+
+    <div class="card qr-card">
+        <h2>Telefonla Bağlan</h2>
+        <p class="muted">
+            Telefonunun kamerasını aşağıdaki kareye tut.
+            Açılan sayfadan fotoğraf ve videolarını yükleyebilirsin.
+        </p>
+        <img class="qr-image" src="{{ qr_data_uri }}" alt="Bağlantı için QR kod">
+        <div class="qr-url">{{ phone_url }}</div>
+        <p class="muted">
+            QR çalışmazsa telefonun tarayıcısına bu adresi yaz.
+            Telefon ve bilgisayar aynı Wi-Fi ağında olmalı.
+        </p>
     </div>
 
     {% if message %}
@@ -354,6 +395,25 @@ def allowed_file(filename: str) -> bool:
     return suffix in ALLOWED_EXTENSIONS
 
 
+_qr_cache: dict[str, str] = {}
+
+
+def make_qr_data_uri(url: str) -> str:
+    """url için pillow gerektirmeyen bir SVG QR üretir ve data-uri döner."""
+    if url in _qr_cache:
+        return _qr_cache[url]
+
+    img = qrcode.make(url, image_factory=qrcode.image.svg.SvgPathImage)
+    buffer = io.BytesIO()
+    img.save(buffer)
+
+    encoded = base64.b64encode(buffer.getvalue()).decode("ascii")
+    data_uri = f"data:image/svg+xml;base64,{encoded}"
+
+    _qr_cache[url] = data_uri
+    return data_uri
+
+
 def human_size(size_bytes: int) -> str:
     size = float(size_bytes)
 
@@ -443,6 +503,9 @@ def index():
     message = request.args.get("message", "")
     message_class = request.args.get("message_class", "ok")
 
+    phone_url = f"http://{get_local_ip()}:{PORT}/"
+    qr_data_uri = make_qr_data_uri(phone_url)
+
     return render_template_string(
         HTML,
         files=files,
@@ -451,6 +514,8 @@ def index():
         max_mb=MAX_UPLOAD_MB,
         message=message,
         message_class=message_class,
+        phone_url=phone_url,
+        qr_data_uri=qr_data_uri,
     )
 
 
@@ -601,8 +666,8 @@ if __name__ == "__main__":
     print(f"Maksimum upload: {MAX_UPLOAD_MB} MB")
     print(f"Verbose log: {'AÇIK' if VERBOSE_LOG else 'KAPALI'}")
     print()
-    print(f"Bilgisayardan: http://127.0.0.1:5000")
-    print(f"iPhone'dan:    http://{ip}:5000")
+    print(f"Bilgisayardan: http://127.0.0.1:{PORT}")
+    print(f"iPhone'dan:    http://{ip}:{PORT}")
     print()
     print("Kullanıcı adı boş bırakılabilir.")
     print("Parola: baslat.bat içindeki UPLOAD_PASSWORD değeri.")
@@ -612,4 +677,4 @@ if __name__ == "__main__":
     print("==================================================")
     print()
 
-    serve(app, host="0.0.0.0", port=5000, threads=8)
+    serve(app, host="0.0.0.0", port=PORT, threads=8)
