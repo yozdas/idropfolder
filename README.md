@@ -70,7 +70,7 @@ Klasörde boş bir yere sağ tıklayın ve Terminal veya Komut İstemi açın.
 Sonra şu komutları sırayla çalıştırın:
 
 ```bat
-cd /d E:\iphone_photo_al
+cd E:\iphone_photo_al
 python -m venv .venv
 .venv\Scripts\activate
 python -m pip install --upgrade pip
