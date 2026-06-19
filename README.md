@@ -298,7 +298,7 @@ Desteklenen dosya türleri:
 Uygulamayı çift tıklamak yerine Komut İstemi’nden çalıştırın.
 
 ```bat
-cd /d E:\iphone_photo_al
+cd E:\iphone_photo_al
 baslat.bat
 ```
 
