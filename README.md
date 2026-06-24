@@ -134,9 +134,15 @@ http://192.168.1.45:5000
 
 iPhone ve bilgisayar aynı Wi-Fi ağına bağlı olmalıdır.
 
-iPhone’da Safari’yi açın.
+iPhone ile uygulamaya bağlanmanın iki yolu vardır:
 
-Terminal ekranında görünen iPhone adresini Safari’ye yazın.
+**Yöntem 1: QR Kod İle Bağlanma (Önerilen)**
+1. Bilgisayarınızda tarayıcıyı açın ve terminalde `Bilgisayardan` yazan adrese gidin (Örnek: `http://127.0.0.1:5000`).
+2. Ekranda beliren QR kodu iPhone kamerasından okutarak sayfaya gidin.
+
+**Yöntem 2: Adres Yazarak Bağlanma**
+1. iPhone’da Safari’yi açın.
+2. Terminal ekranında görünen `iPhone'dan` yazan adresi Safari’ye yazın.
 
 Örnek:
 
@@ -311,8 +317,8 @@ Böylece hata mesajını görebilirsiniz.
 Her kullanımda yapılacaklar:
 
 1. `baslat.bat` dosyasına çift tıkla.
-2. Terminalde yazan iPhone adresini kopyala.
-3. iPhone’da Safari’ye bu adresi yaz.
+2. Bilgisayarda tarayıcıyı açıp `http://127.0.0.1:5000` adresine gir.
+3. iPhone kamerasıyla ekrandaki QR kodu okut (veya adresi iPhone tarayıcısına yaz).
 4. Parolayı gir.
 5. Fotoğraf ve videoları seç.
 6. `SEÇİLENLERİ YÜKLE` butonuna bas.
